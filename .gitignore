@@ -1,0 +1,29 @@
+# Node modules y dependencias
+node_modules/
+vendor/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Archivos temporales
+*.log
+*.tmp
+
+# Archivos de entorno (credenciales, claves)
+.env
+.env.local
+.env.production
+
+# Archivos de base de datos locales
+backend/database/*.sqlite
+backend/database/*.db
+
+# Archivos personales
+*.bak
+*.zip
+*.rar
+
+# Configuraciones específicas del editor
+.vscode/
+.idea/
