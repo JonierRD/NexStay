@@ -6,9 +6,15 @@ vendor/
 .DS_Store
 Thumbs.db
 
+# Archivos de entorno y configuración
+.env
+*.log
+
 # Archivos temporales
+vendor/
 *.log
 *.tmp
+*.cache
 
 # Archivos de entorno (credenciales, claves)
 .env
@@ -18,6 +24,7 @@ Thumbs.db
 # Archivos de base de datos locales
 backend/database/*.sqlite
 backend/database/*.db
+backend/database/hotel_db.sql
 
 # Archivos personales
 *.bak
@@ -27,3 +34,7 @@ backend/database/*.db
 # Configuraciones específicas del editor
 .vscode/
 .idea/
+
+# Archivos de compilación o empaquetado (si usas build en el futuro)
+dist/
+build/
