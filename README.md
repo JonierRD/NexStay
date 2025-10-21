@@ -36,13 +36,13 @@ NEXSTAY/
 
 1. Clona este repositorio:  
    ```bash
-   git clone https://github.com/tuusuario/nexstay.git
+   git clone https://github.com/JonierRD/NexStay
    Abre la carpeta en VS Code.
 
 Configura la base de datos (archivo backend/database/conexion.php).
 
 Ejecuta en tu navegador:
-http://localhost/NEXSTAY/frontend/index.html
+http://localhost/NexStay/
 
 👤 Autores
 
