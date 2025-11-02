@@ -1,107 +1,68 @@
 <?php
-require_once '../database/conexion.php';
+require_once __DIR__ . '/../database/conexion.php';
 
 class Usuarios {
-    private $conexion;
+    private $conn;
 
     public function __construct() {
-        $this->conexion = new Conexion();
-        $this->conexion = $this->conexion->connect();
+        $database = new Conexion();
+        $this->conn = $database->getConnection();
     }
 
     // Obtener todos los usuarios
     public function obtenerUsuarios() {
-        $sql = "SELECT * FROM usuarios";
-        $consulta = $this->conexion->prepare($sql);
-        $consulta->execute();
-        return $consulta->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $this->conn->prepare("SELECT * FROM usuarios");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     // Obtener un usuario por ID
-    public function obtenerUsuarioPorId($id) {
-        $sql = "SELECT * FROM usuarios WHERE id = ?";
-        $consulta = $this->conexion->prepare($sql);
-        $consulta->execute([$id]);
-        return $consulta->fetch(PDO::FETCH_ASSOC);
+    public function obtenerUsuarioId($id) {
+        $stmt = $this->conn->prepare("SELECT * FROM usuarios WHERE id = :id");
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Crear nuevo usuario
-    public function crearUsuario($data) {
-        $sql = "INSERT INTO usuarios (usuario, password, nombre, correo, rol, creado_at)
-                VALUES (?, ?, ?, ?, ?, ?)";
-        $consulta = $this->conexion->prepare($sql);
-
-        // Encriptar contraseña antes de guardar
-        $passwordHash = password_hash($data['password'], PASSWORD_BCRYPT);
-
-        return $consulta->execute([
-            $data['usuario'],
-            $passwordHash,
-            $data['nombre'],
-            $data['correo'],
-            $data['rol'],
-            $data['creado_at']
-        ]);
+    // Insertar usuario
+    public function insertarUsuario($usuario, $password, $nombre, $correo, $rol) {
+        $stmt = $this->conn->prepare("
+            INSERT INTO usuarios (usuario, password, nombre, correo, rol, creado_at)
+            VALUES (:usuario, :password, :nombre, :correo, :rol, NOW())
+        ");
+        $stmt->bindParam(':usuario', $usuario);
+        $stmt->bindParam(':password', $password);
+        $stmt->bindParam(':nombre', $nombre);
+        $stmt->bindParam(':correo', $correo);
+        $stmt->bindParam(':rol', $rol);
+        return $stmt->execute();
     }
 
-    // Actualizar un usuario existente
-    public function actualizarUsuario($id, $data) {
-        // Si se envía una nueva contraseña, la encripta; si no, conserva la actual
-        if (!empty($data['password'])) {
-            $passwordHash = password_hash($data['password'], PASSWORD_BCRYPT);
-            $sql = "UPDATE usuarios SET 
-                        usuario = ?, 
-                        password = ?, 
-                        nombre = ?, 
-                        correo = ?, 
-                        rol = ? 
-                    WHERE id = ?";
-            $params = [
-                $data['usuario'],
-                $passwordHash,
-                $data['nombre'],
-                $data['correo'],
-                $data['rol'],
-                $id
-            ];
-        } else {
-            $sql = "UPDATE usuarios SET 
-                        usuario = ?, 
-                        nombre = ?, 
-                        correo = ?, 
-                        rol = ? 
-                    WHERE id = ?";
-            $params = [
-                $data['usuario'],
-                $data['nombre'],
-                $data['correo'],
-                $data['rol'],
-                $id
-            ];
-        }
-
-        $consulta = $this->conexion->prepare($sql);
-        return $consulta->execute($params);
+    // Actualizar usuario
+    public function actualizarUsuario($id, $usuario, $password, $nombre, $correo, $rol) {
+        $stmt = $this->conn->prepare("
+            UPDATE usuarios SET 
+                usuario = :usuario,
+                password = :password,
+                nombre = :nombre,
+                correo = :correo,
+                rol = :rol
+            WHERE id = :id
+        ");
+        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':usuario', $usuario);
+        $stmt->bindParam(':password', $password);
+        $stmt->bindParam(':nombre', $nombre);
+        $stmt->bindParam(':correo', $correo);
+        $stmt->bindParam(':rol', $rol);
+        return $stmt->execute();
     }
 
-    // Eliminar un usuario
+    // Eliminar usuario
     public function eliminarUsuario($id) {
-        $sql = "DELETE FROM usuarios WHERE id = ?";
-        $consulta = $this->conexion->prepare($sql);
-        return $consulta->execute([$id]);
-    }
-
-    // Verificar login (usuario y contraseña)
-    public function verificarCredenciales($usuario, $password) {
-        $sql = "SELECT * FROM usuarios WHERE usuario = ?";
-        $consulta = $this->conexion->prepare($sql);
-        $consulta->execute([$usuario]);
-        $user = $consulta->fetch(PDO::FETCH_ASSOC);
-
-        if ($user && password_verify($password, $user['password'])) {
-            return $user;
-        }
-        return false;
+        $stmt = $this->conn->prepare("DELETE FROM usuarios WHERE id = :id");
+        $stmt->bindParam(':id', $id);
+        return $stmt->execute();
     }
 }
 ?>

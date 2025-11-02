@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . '/../database/conexion.php');
+require_once __DIR__ . '/../database/conexion.php';
 
 class Mantenimientos {
     private $conn;
@@ -9,15 +9,24 @@ class Mantenimientos {
         $this->conn = $database->getConnection();
     }
 
-    // 🔹 Obtener todos los mantenimientos
+    // Obtener todos los registros de mantenimiento
     public function obtenerMantenimientos() {
         $query = "SELECT * FROM mantenimientos";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    // Obtener un mantenimiento por ID
+public function obtenerMantenimiento($id) {
+    $query = "SELECT * FROM mantenimientos WHERE id = :id";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(':id', $id);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC); // Devuelve un solo registro
+}
 
-    // 🔹 Crear un nuevo mantenimiento
+
+    // Crear nuevo mantenimiento
     public function crearMantenimiento($habitacion_id, $descripcion, $estado, $fecha_reporte, $fecha_solucion, $empleado_id) {
         $query = "INSERT INTO mantenimientos 
         (habitacion_id, descripcion, estado, fecha_reporte, fecha_solucion, empleado_id)
@@ -31,10 +40,11 @@ class Mantenimientos {
         $stmt->bindParam(':fecha_reporte', $fecha_reporte);
         $stmt->bindParam(':fecha_solucion', $fecha_solucion);
         $stmt->bindParam(':empleado_id', $empleado_id);
+
         return $stmt->execute();
     }
 
-    // 🔹 Actualizar mantenimiento existente
+    // Actualizar mantenimiento
     public function actualizarMantenimiento($id, $habitacion_id, $descripcion, $estado, $fecha_reporte, $fecha_solucion, $empleado_id) {
         $query = "UPDATE mantenimientos SET 
                     habitacion_id = :habitacion_id,
@@ -53,10 +63,11 @@ class Mantenimientos {
         $stmt->bindParam(':fecha_reporte', $fecha_reporte);
         $stmt->bindParam(':fecha_solucion', $fecha_solucion);
         $stmt->bindParam(':empleado_id', $empleado_id);
+
         return $stmt->execute();
     }
 
-    // 🔹 Eliminar un mantenimiento
+    // Eliminar mantenimiento
     public function eliminarMantenimiento($id) {
         $query = "DELETE FROM mantenimientos WHERE id = :id";
         $stmt = $this->conn->prepare($query);

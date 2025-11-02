@@ -1,53 +1,68 @@
 <?php
-require_once "../database/conexion.php";
+require_once __DIR__ . '/../database/conexion.php';
 
 class Habitaciones {
-    private $conexion;
+    private $conn;
 
     public function __construct() {
-        $this->conexion = new Conexion();
-        $this->conexion = $this->conexion->connect();
+        $database = new Conexion();
+        $this->conn = $database->getConnection();
     }
 
-    // 🔹 Obtener todas las habitaciones
-    public function getHabitaciones() {
-        $sql = "SELECT * FROM habitaciones ORDER BY id DESC";
-        $query = $this->conexion->prepare($sql);
-        $query->execute();
-        return $query->fetchAll(PDO::FETCH_ASSOC);
+    // Obtener todas las habitaciones
+    public function obtenerHabitaciones() {
+        $stmt = $this->conn->prepare("SELECT * FROM habitaciones");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // 🔹 Obtener una habitación por ID
-    public function getHabitacion($id) {
-        $sql = "SELECT * FROM habitaciones WHERE id = ?";
-        $query = $this->conexion->prepare($sql);
-        $query->execute([$id]);
-        return $query->fetch(PDO::FETCH_ASSOC);
+    // Obtener habitación por ID
+    public function obtenerHabitacion($id) {
+        $stmt = $this->conn->prepare("SELECT * FROM habitaciones WHERE id = :id");
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // 🔹 Crear una nueva habitación
-    public function crearHabitacion($numero, $tipo, $descripcion, $precio, $estado, $creado_at) {
-        $sql = "INSERT INTO habitaciones (numero, tipo, descripcion, precio, estado, creado_at)
-                VALUES (?, ?, ?, ?, ?, ?)";
-        $query = $this->conexion->prepare($sql);
-        $query->execute([$numero, $tipo, $descripcion, $precio, $estado, $creado_at]);
-        return $this->conexion->lastInsertId();
+    // Crear nueva habitación
+    public function crearHabitacion($numero, $tipo, $descripcion, $precio, $estado) {
+        $stmt = $this->conn->prepare("
+            INSERT INTO habitaciones (numero, tipo, descripcion, precio, estado, creado_at)
+            VALUES (:numero, :tipo, :descripcion, :precio, :estado, NOW())
+        ");
+        $stmt->bindParam(':numero', $numero);
+        $stmt->bindParam(':tipo', $tipo);
+        $stmt->bindParam(':descripcion', $descripcion);
+        $stmt->bindParam(':precio', $precio);
+        $stmt->bindParam(':estado', $estado);
+        return $stmt->execute();
     }
 
-    // 🔹 Actualizar una habitación existente
+    // Actualizar habitación
     public function actualizarHabitacion($id, $numero, $tipo, $descripcion, $precio, $estado) {
-        $sql = "UPDATE habitaciones 
-                SET numero = ?, tipo = ?, descripcion = ?, precio = ?, estado = ?
-                WHERE id = ?";
-        $query = $this->conexion->prepare($sql);
-        return $query->execute([$numero, $tipo, $descripcion, $precio, $estado, $id]);
+        $stmt = $this->conn->prepare("
+            UPDATE habitaciones SET
+            numero = :numero,
+            tipo = :tipo,
+            descripcion = :descripcion,
+            precio = :precio,
+            estado = :estado
+            WHERE id = :id
+        ");
+        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':numero', $numero);
+        $stmt->bindParam(':tipo', $tipo);
+        $stmt->bindParam(':descripcion', $descripcion);
+        $stmt->bindParam(':precio', $precio);
+        $stmt->bindParam(':estado', $estado);
+        return $stmt->execute();
     }
 
-    // 🔹 Eliminar una habitación
+    // Eliminar habitación
     public function eliminarHabitacion($id) {
-        $sql = "DELETE FROM habitaciones WHERE id = ?";
-        $query = $this->conexion->prepare($sql);
-        return $query->execute([$id]);
+        $stmt = $this->conn->prepare("DELETE FROM habitaciones WHERE id = :id");
+        $stmt->bindParam(':id', $id);
+        return $stmt->execute();
     }
 }
 ?>

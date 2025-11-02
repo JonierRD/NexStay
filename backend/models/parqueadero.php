@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . '/../database/conexion.php');
+require_once __DIR__ . '/../database/conexion.php';
 
 class Parqueadero {
     private $conn;
@@ -9,22 +9,27 @@ class Parqueadero {
         $this->conn = $database->getConnection();
     }
 
-    // 🔹 Obtener todos los registros de parqueadero
+    // Obtener todos los registros
     public function obtenerParqueadero() {
-        $query = "SELECT * FROM parqueadero";
-        $stmt = $this->conn->prepare($query);
+        $stmt = $this->conn->prepare("SELECT * FROM parqueadero");
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // 🔹 Crear un nuevo registro
-    public function crearRegistro($placa, $cliente_id, $habitacion_id, $tarifa, $fecha_entrada, $fecha_salida) {
-        $query = "INSERT INTO parqueadero 
-        (placa, cliente_id, habitacion_id, tarifa, fecha_entrada, fecha_salida)
-        VALUES 
-        (:placa, :cliente_id, :habitacion_id, :tarifa, :fecha_entrada, :fecha_salida)";
+    // Obtener un registro por ID
+    public function obtenerParqueaderoId($id) {
+        $stmt = $this->conn->prepare("SELECT * FROM parqueadero WHERE id = :id");
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 
-        $stmt = $this->conn->prepare($query);
+    // Insertar un nuevo registro
+    public function insertarParqueadero($placa, $cliente_id, $habitacion_id, $tarifa, $fecha_entrada, $fecha_salida) {
+        $stmt = $this->conn->prepare("
+            INSERT INTO parqueadero (placa, cliente_id, habitacion_id, tarifa, fecha_entrada, fecha_salida)
+            VALUES (:placa, :cliente_id, :habitacion_id, :tarifa, :fecha_entrada, :fecha_salida)
+        ");
         $stmt->bindParam(':placa', $placa);
         $stmt->bindParam(':cliente_id', $cliente_id);
         $stmt->bindParam(':habitacion_id', $habitacion_id);
@@ -34,18 +39,18 @@ class Parqueadero {
         return $stmt->execute();
     }
 
-    // 🔹 Actualizar registro existente
-    public function actualizarRegistro($id, $placa, $cliente_id, $habitacion_id, $tarifa, $fecha_entrada, $fecha_salida) {
-        $query = "UPDATE parqueadero SET 
-                    placa = :placa,
-                    cliente_id = :cliente_id,
-                    habitacion_id = :habitacion_id,
-                    tarifa = :tarifa,
-                    fecha_entrada = :fecha_entrada,
-                    fecha_salida = :fecha_salida
-                  WHERE id = :id";
-
-        $stmt = $this->conn->prepare($query);
+    // Actualizar un registro
+    public function actualizarParqueadero($id, $placa, $cliente_id, $habitacion_id, $tarifa, $fecha_entrada, $fecha_salida) {
+        $stmt = $this->conn->prepare("
+            UPDATE parqueadero SET 
+                placa = :placa, 
+                cliente_id = :cliente_id, 
+                habitacion_id = :habitacion_id, 
+                tarifa = :tarifa, 
+                fecha_entrada = :fecha_entrada, 
+                fecha_salida = :fecha_salida
+            WHERE id = :id
+        ");
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':placa', $placa);
         $stmt->bindParam(':cliente_id', $cliente_id);
@@ -56,10 +61,9 @@ class Parqueadero {
         return $stmt->execute();
     }
 
-    // 🔹 Eliminar registro
-    public function eliminarRegistro($id) {
-        $query = "DELETE FROM parqueadero WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
+    // Eliminar un registro
+    public function eliminarParqueadero($id) {
+        $stmt = $this->conn->prepare("DELETE FROM parqueadero WHERE id = :id");
         $stmt->bindParam(':id', $id);
         return $stmt->execute();
     }

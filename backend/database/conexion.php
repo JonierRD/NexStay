@@ -1,22 +1,26 @@
 <?php
-// Datos de conexión
-$host = "127.0.0.1";
-$port = 3307;            // ⚠ Puerto correcto de tu MySQL
-$dbname = "nexstay_db";
-$user = "root";
-$password = "12345";
+class Conexion {
+    private $host = "127.0.0.1";
+    private $port = "3307"; // usa el puerto correcto
+    private $dbname = "nexstay_db";
+    private $user = "root";
+    private $password = "12345";
+    private $conn;
 
-try {
-    $pdo = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4", $user, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    public function getConnection() {
+        $this->conn = null;
+        try {
+            $this->conn = new PDO(
+                "mysql:host={$this->host};port={$this->port};dbname={$this->dbname};charset=utf8mb4",
+                $this->user,
+                $this->password
+            );
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            echo "❌ Error de conexión: " . $e->getMessage();
+        }
 
-    // Mensaje para verificar
-    echo "✅ Conexión exitosa a la base de datos $dbname";
-$stmt = $pdo->query("SELECT * FROM usuarios");
-$result = $stmt->fetchAll();
-print_r($result);
-
-} catch (PDOException $e) {
-    echo "❌ Error de conexión: " . $e->getMessage();
-    exit;
+        return $this->conn;
+    }
 }
+?>

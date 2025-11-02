@@ -16,6 +16,16 @@ class Empleados {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    
+    // Obtener un empleado por ID
+public function obtenerEmpleado($id) {
+    $query = "SELECT * FROM empleados WHERE id = :id";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(':id', $id);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC); // devuelve un solo registro
+}
+
 
     // Crear un nuevo empleado
     public function crearEmpleado($nombre, $documento, $cargo, $correo, $telefono, $horario) {

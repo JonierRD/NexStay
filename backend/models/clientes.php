@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . '/../database/conexion.php');
+require_once __DIR__ . '/../database/conexion.php';
 
 class Clientes {
     private $conn;
@@ -18,25 +18,42 @@ class Clientes {
     }
 
     // Crear un nuevo cliente
-    public function crearCliente($nombre, $cedula, $ciudad_origen, $ciudad_destino, $profesion, $documento, $correo, $telefono, $habitacion_id, $direccion) {
-        $query = "INSERT INTO clientes 
+public function crearCliente($nombre, $cedula, $ciudad_origen, $ciudad_destino, $profesion, $documento, $correo, $telefono, $habitacion_id, $direccion) {
+    $query = "INSERT INTO clientes 
         (nombre, cedula, ciudad_origen, ciudad_destino, profesion, documento, correo, telefono, habitacion_id, direccion, creado_at) 
         VALUES 
         (:nombre, :cedula, :ciudad_origen, :ciudad_destino, :profesion, :documento, :correo, :telefono, :habitacion_id, :direccion, NOW())";
-        
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':nombre', $nombre);
-        $stmt->bindParam(':cedula', $cedula);
-        $stmt->bindParam(':ciudad_origen', $ciudad_origen);
-        $stmt->bindParam(':ciudad_destino', $ciudad_destino);
-        $stmt->bindParam(':profesion', $profesion);
-        $stmt->bindParam(':documento', $documento);
-        $stmt->bindParam(':correo', $correo);
-        $stmt->bindParam(':telefono', $telefono);
-        $stmt->bindParam(':habitacion_id', $habitacion_id);
-        $stmt->bindParam(':direccion', $direccion);
-        return $stmt->execute();
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(':nombre', $nombre);
+    $stmt->bindParam(':cedula', $cedula);
+    $stmt->bindParam(':ciudad_origen', $ciudad_origen);
+    $stmt->bindParam(':ciudad_destino', $ciudad_destino);
+    $stmt->bindParam(':profesion', $profesion);
+    $stmt->bindParam(':documento', $documento);
+    $stmt->bindParam(':correo', $correo);
+    $stmt->bindParam(':telefono', $telefono);
+    $stmt->bindParam(':habitacion_id', $habitacion_id);
+    $stmt->bindParam(':direccion', $direccion);
+
+    if($stmt->execute()){
+        return true;
+    } else {
+        // Muestra error real de MySQL para depuración
+        print_r($stmt->errorInfo());
+        return false;
     }
+}
+
+// Obtener un cliente por ID
+public function obtenerCliente($id) {
+    $query = "SELECT * FROM clientes WHERE id = :id";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(':id', $id);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC); // fetch() devuelve un solo registro
+}
+
 
     // Actualizar cliente
     public function actualizarCliente($id, $nombre, $cedula, $ciudad_origen, $ciudad_destino, $profesion, $documento, $correo, $telefono, $habitacion_id, $direccion) {

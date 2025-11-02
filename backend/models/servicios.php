@@ -1,66 +1,65 @@
 <?php
-require_once '../database/conexion.php';
+require_once __DIR__ . '/../database/conexion.php';
 
 class Servicios {
-    private $conexion;
+    private $conn;
 
     public function __construct() {
-        $this->conexion = new Conexion();
-        $this->conexion = $this->conexion->connect();
+        $database = new Conexion();
+        $this->conn = $database->getConnection();
     }
 
     // Obtener todos los servicios
     public function obtenerServicios() {
-        $sql = "SELECT * FROM servicios";
-        $consulta = $this->conexion->prepare($sql);
-        $consulta->execute();
-        return $consulta->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $this->conn->prepare("SELECT * FROM servicios");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     // Obtener un servicio por ID
-    public function obtenerServicioPorId($id) {
-        $sql = "SELECT * FROM servicios WHERE id = ?";
-        $consulta = $this->conexion->prepare($sql);
-        $consulta->execute([$id]);
-        return $consulta->fetch(PDO::FETCH_ASSOC);
+    public function obtenerServicioId($id) {
+        $stmt = $this->conn->prepare("SELECT * FROM servicios WHERE id = :id");
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Crear un nuevo servicio
-    public function crearServicio($data) {
-        $sql = "INSERT INTO servicios (nombre, descripcion, precio, disponible)
-                VALUES (?, ?, ?, ?)";
-        $consulta = $this->conexion->prepare($sql);
-        return $consulta->execute([
-            $data['nombre'],
-            $data['descripcion'],
-            $data['precio'],
-            $data['disponible']
-        ]);
+    // Insertar un servicio
+    public function insertarServicio($nombre, $descripcion, $precio, $disponible) {
+        $stmt = $this->conn->prepare("
+            INSERT INTO servicios (nombre, descripcion, precio, disponible)
+            VALUES (:nombre, :descripcion, :precio, :disponible)
+        ");
+        $stmt->bindParam(':nombre', $nombre);
+        $stmt->bindParam(':descripcion', $descripcion);
+        $stmt->bindParam(':precio', $precio);
+        $stmt->bindParam(':disponible', $disponible);
+        return $stmt->execute();
     }
 
-    // Actualizar un servicio existente
-    public function actualizarServicio($id, $data) {
-        $sql = "UPDATE servicios SET 
-                    nombre = ?, 
-                    descripcion = ?, 
-                    precio = ?, 
-                    disponible = ?
-                WHERE id = ?";
-        $consulta = $this->conexion->prepare($sql);
-        return $consulta->execute([
-            $data['nombre'],
-            $data['descripcion'],
-            $data['precio'],
-            $data['disponible'],
-            $id
-        ]);
+    // Actualizar un servicio
+    public function actualizarServicio($id, $nombre, $descripcion, $precio, $disponible) {
+        $stmt = $this->conn->prepare("
+            UPDATE servicios SET 
+                nombre = :nombre, 
+                descripcion = :descripcion, 
+                precio = :precio, 
+                disponible = :disponible
+            WHERE id = :id
+        ");
+        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':nombre', $nombre);
+        $stmt->bindParam(':descripcion', $descripcion);
+        $stmt->bindParam(':precio', $precio);
+        $stmt->bindParam(':disponible', $disponible);
+        return $stmt->execute();
     }
 
     // Eliminar un servicio
     public function eliminarServicio($id) {
-        $sql = "DELETE FROM servicios WHERE id = ?";
-        $consulta = $this->conexion->prepare($sql);
-        return $consulta->execute([$id]);
+        $stmt = $this->conn->prepare("DELETE FROM servicios WHERE id = :id");
+        $stmt->bindParam(':id', $id);
+        return $stmt->execute();
     }
 }
 ?>
