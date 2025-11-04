@@ -24,8 +24,30 @@ class Reservas {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    // Verificar si una habitación está libre
+    private function habitacionDisponible($habitacion_id) {
+        $stmt = $this->conn->prepare("SELECT estado FROM habitaciones WHERE id = :habitacion_id");
+        $stmt->bindParam(':habitacion_id', $habitacion_id);
+        $stmt->execute();
+        $habitacion = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $habitacion && strtolower(trim($habitacion['estado'])) === 'disponible';
+    }
+
+    // Cambiar estado de habitación
+    private function actualizarEstadoHabitacion($habitacion_id, $estado) {
+        $stmt = $this->conn->prepare("UPDATE habitaciones SET estado = :estado WHERE id = :habitacion_id");
+        $stmt->bindParam(':estado', $estado);
+        $stmt->bindParam(':habitacion_id', $habitacion_id);
+        $stmt->execute();
+    }
+
     // Crear nueva reserva
     public function crearReserva($cliente_id, $habitacion_id, $fecha_entrada, $fecha_salida, $total, $estado) {
+        // Validar disponibilidad
+        if (!$this->habitacionDisponible($habitacion_id)) {
+            return ["error" => "La habitación seleccionada no está disponible."];
+        }
+
         $stmt = $this->conn->prepare("
             INSERT INTO reservas (cliente_id, habitacion_id, fecha_entrada, fecha_salida, total, estado, creado_at)
             VALUES (:cliente_id, :habitacion_id, :fecha_entrada, :fecha_salida, :total, :estado, NOW())
@@ -36,7 +58,13 @@ class Reservas {
         $stmt->bindParam(':fecha_salida', $fecha_salida);
         $stmt->bindParam(':total', $total);
         $stmt->bindParam(':estado', $estado);
-        return $stmt->execute();
+
+        if ($stmt->execute()) {
+            // Marcar habitación como ocupada
+            $this->actualizarEstadoHabitacion($habitacion_id, 'ocupada');
+            return ["success" => true];
+        }
+        return ["error" => "No se pudo crear la reserva."];
     }
 
     // Actualizar reserva
@@ -58,14 +86,33 @@ class Reservas {
         $stmt->bindParam(':fecha_salida', $fecha_salida);
         $stmt->bindParam(':total', $total);
         $stmt->bindParam(':estado', $estado);
-        return $stmt->execute();
+
+        $resultado = $stmt->execute();
+
+        // Si la reserva se marca como completada o cancelada → liberar habitación
+        if (in_array(strtolower($estado), ['finalizada', 'cancelada'])) {
+            $this->actualizarEstadoHabitacion($habitacion_id, 'disponible');
+        }
+
+        return ["success" => $resultado];
     }
 
     // Eliminar reserva
     public function eliminarReserva($id) {
+        // Obtener la reserva antes de eliminar
+        $reserva = $this->obtenerReserva($id);
+        if (!$reserva) return ["error" => "Reserva no encontrada"];
+
         $stmt = $this->conn->prepare("DELETE FROM reservas WHERE id = :id");
         $stmt->bindParam(':id', $id);
-        return $stmt->execute();
+        $resultado = $stmt->execute();
+
+        // Liberar la habitación si existía
+        if ($resultado && isset($reserva['habitacion_id'])) {
+            $this->actualizarEstadoHabitacion($reserva['habitacion_id'], 'disponible');
+        }
+
+        return ["success" => $resultado];
     }
 }
 ?>

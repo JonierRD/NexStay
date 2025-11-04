@@ -20,7 +20,7 @@ switch($op) {
         echo json_encode($dato);
         break;
 
-case "insertar":
+case "crear":
     // Leer JSON enviado en body
     $data = json_decode(file_get_contents("php://input"), true);
 
