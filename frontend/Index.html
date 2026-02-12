@@ -2,11 +2,250 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>NEXSTAY - Administración de Hoteles</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexStay - Sistema de Gestión Hotelera</title>
   <link rel="icon" href="LogoApp.ico" type="image/x-icon">
+  <link rel="stylesheet" href="css/index.css">
+  <script>
+    // Aplicar tema inmediatamente antes de que se renderice la página
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
 </head>
-<body style="font-family: Arial; text-align: center; margin-top: 100px;">
-  <h1>Bienvenido a NEXSTAY 🏨</h1>
-  <p>Servidor local funcionando correctamente.</p>
+<body>
+  <script>
+    // Aplicar dark-mode a body inmediatamente
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark-mode');
+    }
+  </script>
+  <!-- Splash Screen -->
+  <div id="splashScreen" class="splash-screen active">
+    <div class="splash-content">
+      <h1 class="splash-title">🏨 NexStay</h1>
+      <p class="splash-subtitle">Gestión Hotelera</p>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="nav-container">
+      <div class="logo">
+        🏨 NexStay
+      </div>
+      <nav>
+        <div class="nav-links-wrapper">
+          <ul class="nav-links">
+            <li><a href="#inicio" class="nav-link" data-section="inicio">Inicio</a></li>
+            <li><a href="#caracteristicas" class="nav-link" data-section="caracteristicas">Características</a></li>
+            <li><a href="#modulos" class="nav-link" data-section="modulos">Módulos</a></li>
+            <li><a href="#contacto" class="nav-link" data-section="contacto">Contacto</a></li>
+          </ul>
+          <div class="nav-underline"></div>
+        </div>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" title="Cambiar tema">
+          🌙
+        </button>
+        <a href="Pages/login.php" class="btn-login" id="btnAccessSystem">Acceder al Sistema</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero" id="inicio">
+    <div class="hero-content">
+      <h1>
+        Gestiona tu hotel con <span class="highlight">NexStay</span>
+      </h1>
+      <p>
+        Sistema integral de administración hotelera. Controla reservas, clientes, inventario, facturación y más desde una sola plataforma.
+      </p>
+      <a href="Pages/login.php" class="btn-primary" id="btnStartNow">Comenzar Ahora →</a>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features" id="caracteristicas">
+    <div class="container">
+      <h2 class="section-title">¿Por qué elegir NexStay?</h2>
+      <p class="section-subtitle">
+        Herramientas profesionales diseñadas para optimizar la gestión de tu hotel
+      </p>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3>Gestión Centralizada</h3>
+          <p>Administra todas las operaciones de tu hotel desde un solo lugar. Ahorra tiempo y reduce errores.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">💼</div>
+          <h3>Control Total</h3>
+          <p>Seguimiento en tiempo real de habitaciones, reservas, clientes y servicios adicionales.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Reportes Detallados</h3>
+          <p>Genera informes de ocupación, ingresos y estadísticas para tomar mejores decisiones.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🔐</div>
+          <h3>Seguro y Confiable</h3>
+          <p>Sistema de autenticación robusto con roles de usuario para proteger tu información.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Rápido y Eficiente</h3>
+          <p>Interfaz optimizada para realizar operaciones rápidamente sin complicaciones.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">�</div>
+          <h3>Interfaz Profesional</h3>
+          <p>Diseño moderno y optimizado para estaciones de trabajo de escritorio.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modules Section -->
+  <section class="modules" id="modulos">
+    <div class="container">
+      <h2 class="section-title">Módulos del Sistema</h2>
+      <p class="section-subtitle">
+        Funcionalidades completas para cada área de tu hotel
+      </p>
+
+      <div class="modules-grid">
+        <div class="module-item">
+          <strong>👥 Clientes</strong>
+          <p>Registro y seguimiento completo de huéspedes</p>
+        </div>
+
+        <div class="module-item">
+          <strong>🏠 Habitaciones</strong>
+          <p>Gestión de tipos, precios y estados en tiempo real</p>
+        </div>
+
+        <div class="module-item">
+          <strong>📅 Reservas</strong>
+          <p>Control de reservaciones con validación de fechas</p>
+        </div>
+
+        <div class="module-item">
+          <strong>🛏️ Hospedajes</strong>
+          <p>Seguimiento de check-in y check-out</p>
+        </div>
+
+        <div class="module-item">
+          <strong>💰 Facturación</strong>
+          <p>Generación automática de facturas y cobros</p>
+        </div>
+
+        <div class="module-item">
+          <strong>🎁 Servicios Adicionales</strong>
+          <p>Lavandería, room service, spa y más</p>
+        </div>
+
+        <div class="module-item">
+          <strong>🚗 Parqueadero</strong>
+          <p>Control de cupos y registro de vehículos</p>
+        </div>
+
+        <div class="module-item">
+          <strong>📦 Inventario</strong>
+          <p>Gestión de stock con alertas automáticas</p>
+        </div>
+
+        <div class="module-item">
+          <strong>👷 Empleados</strong>
+          <p>Administración de personal y horarios</p>
+        </div>
+
+        <div class="module-item">
+          <strong>🔧 Mantenimiento</strong>
+          <p>Seguimiento de reparaciones y estado</p>
+        </div>
+
+        <div class="module-item">
+          <strong>👤 Usuarios</strong>
+          <p>Control de accesos con roles específicos</p>
+        </div>
+
+        <div class="module-item">
+          <strong>📈 Reportes</strong>
+          <p>Estadísticas de ocupación e ingresos</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta">
+    <div class="container">
+      <h2>¿Listo para modernizar tu hotel?</h2>
+      <p>Accede al sistema y comienza a gestionar tu hotel de manera profesional</p>
+      <a href="Pages/login.php" class="btn-secondary" id="btnIngresarSistema">Ingresar al Sistema →</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer" id="contacto">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>🏨 NexStay</h3>
+        <p>Sistema integral de gestión hotelera diseñado para optimizar todas las operaciones de tu establecimiento.</p>
+      </div>
+
+      <div class="footer-section">
+        <h3>Accesos Rápidos</h3>
+        <a href="#inicio">Inicio</a>
+        <a href="#caracteristicas">Características</a>
+        <a href="#modulos">Módulos</a>
+        <a href="Pages/login.php">Iniciar Sesión</a>
+      </div>
+
+      <div class="footer-section">
+        <h3>Información</h3>
+        <p>📧 info@nexstay.com</p>
+        <p>📱 +57 300 123 4567</p>
+        <p>📍 Putumayo, Colombia</p>
+      </div>
+
+      <div class="footer-section">
+        <h3>Proyecto Académico</h3>
+        <p>Universidad Tecnológica del Putumayo</p>
+        <p>Desarrollado por:</p>
+        <p>• Jonier Esneider Rendon</p>
+        <p>• Sidney Kent Villada</p>
+        <p>• Jamilton Jhony Rueda</p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2025 NexStay - Sistema de Gestión Hotelera. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- Loader de transición -->
+  <div id="pageLoader" class="page-loader">
+    <div class="loader-content">
+      <div class="loader"></div>
+      <p>Cargando...</p>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="Js/index.js"></script>
 </body>
 </html>

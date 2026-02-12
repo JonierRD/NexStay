@@ -1,32 +1,47 @@
 <?php
-require_once "../models/Empleados.php";
+require_once "../models/empleados.php";
+require_once "../database/conexion.php";
+require_once __DIR__ . "/../auth/require_auth.php";
+require_once __DIR__ . "/../api/response.php";
 
-header("Content-Type: application/json");
+api_guard(function () {
+    $empleados = new Empleados();
+    $op = $_GET["op"] ?? "";
 
-$empleados = new Empleados();
+    switch ($op) {
+        case 'obtener':
+        case 'obtener_id':
+            require_auth(['admin','recepcionista']);
+            break;
+        case 'crear':
+        case 'actualizar':
+        case 'eliminar':
+            require_auth(['admin']);
+            break;
+        default:
+            api_error("Operación no válida", 400);
+    }
 
-// Determinar la acción según el parámetro 'op' recibido por GET
-$op = isset($_GET["op"]) ? $_GET["op"] : "";
+    $CURRENT_USER = getAuthUser();
 
-switch ($op) {
+    switch ($op) {
+        case 'obtener':
+            api_success("Empleados obtenidos", $empleados->obtenerEmpleados());
 
-    // Obtener todos los empleados
-    case 'obtener':
-        $datos = $empleados->obtenerEmpleados();
-        echo json_encode($datos);
-        break;
+        case 'obtener_id':
+            $id = $_GET["id"] ?? null;
+            if (!$id) {
+                api_error("Falta el parámetro id", 400);
+            }
+            $item = $empleados->obtenerEmpleado($id);
+            if (!$item) {
+                api_error("Empleado no encontrado", 404);
+            }
+            api_success("Empleado obtenido", $item);
 
-    // Obtener un empleado por ID
-    case 'obtener_id':
-        $id = $_GET["id"];
-        $datos = $empleados->obtenerEmpleado($id);
-        echo json_encode($datos);
-        break;
-
-    // Crear nuevo empleado
-    case 'crear':
-        $data = json_decode(file_get_contents("php://input"), true);
-        if (isset($data["nombre"], $data["documento"], $data["cargo"], $data["correo"], $data["telefono"], $data["horario"])) {
+        case 'crear':
+            $data = api_input_json();
+            api_require_fields($data, ["nombre", "documento", "cargo", "correo", "telefono", "horario"]);
             $resultado = $empleados->crearEmpleado(
                 $data["nombre"],
                 $data["documento"],
@@ -35,16 +50,11 @@ switch ($op) {
                 $data["telefono"],
                 $data["horario"]
             );
-            echo json_encode(["success" => $resultado]);
-        } else {
-            echo json_encode(["error" => "Datos incompletos"]);
-        }
-        break;
+            api_success("Empleado creado correctamente", ["success" => (bool)$resultado], 201);
 
-    // Actualizar empleado
-    case 'actualizar':
-        $data = json_decode(file_get_contents("php://input"), true);
-        if (isset($data["id"], $data["nombre"], $data["documento"], $data["cargo"], $data["correo"], $data["telefono"], $data["horario"])) {
+        case 'actualizar':
+            $data = api_input_json();
+            api_require_fields($data, ["id", "nombre", "documento", "cargo", "correo", "telefono", "horario"]);
             $resultado = $empleados->actualizarEmpleado(
                 $data["id"],
                 $data["nombre"],
@@ -54,21 +64,15 @@ switch ($op) {
                 $data["telefono"],
                 $data["horario"]
             );
-            echo json_encode(["success" => $resultado]);
-        } else {
-            echo json_encode(["error" => "Datos incompletos"]);
-        }
-        break;
+            api_success("Empleado actualizado correctamente", ["success" => (bool)$resultado]);
 
-    // Eliminar empleado
-    case 'eliminar':
-        $id = $_GET["id"];
-        $resultado = $empleados->eliminarEmpleado($id);
-        echo json_encode(["success" => $resultado]);
-        break;
+        case 'eliminar':
+            $id = $_GET["id"] ?? null;
+            if (!$id) {
+                api_error("Falta el parámetro id", 400);
+            }
+            $resultado = $empleados->eliminarEmpleado($id);
+            api_success("Empleado eliminado correctamente", ["success" => (bool)$resultado]);
+    }
+});
 
-    default:
-        echo json_encode(["error" => "Operación no válida"]);
-        break;
-}
-?>

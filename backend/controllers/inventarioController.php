@@ -1,19 +1,35 @@
 <?php
-require_once "../models/Inventario.php";
+require_once "../models/inventario.php";
+require_once "../database/conexion.php";
+require_once __DIR__ . "/../auth/require_auth.php";
+require_once __DIR__ . "/../api/response.php";
 
-header("Content-Type: application/json");
+api_guard(function () {
+    $inventario = new Inventario();
+    $op = $_GET["op"] ?? "";
 
-$inventario = new Inventario();
-$op = isset($_GET["op"]) ? $_GET["op"] : "";
+    switch ($op) {
+        case 'obtener':
+            require_auth(['admin', 'recepcionista']);
+            break;
+        case 'crear':
+        case 'actualizar':
+        case 'eliminar':
+            require_auth(['admin']);
+            break;
+        default:
+            api_error("Operación no válida", 400);
+    }
 
-switch ($op) {
-    case 'obtener':
-        echo json_encode($inventario->obtenerInventario());
-        break;
+    $CURRENT_USER = getAuthUser();
 
-    case 'crear':
-        $data = json_decode(file_get_contents("php://input"), true);
-        if(isset($data["categoria"], $data["nombre"], $data["cantidad"], $data["precio_unitario"], $data["stock_minimo"], $data["dias_mes"], $data["ventas_mes"], $data["total_existencia"], $data["unidad"])) {
+    switch ($op) {
+        case 'obtener':
+            api_success("Inventario obtenido", $inventario->obtenerInventario());
+
+        case 'crear':
+            $data = api_input_json();
+            api_require_fields($data, ["categoria", "nombre", "cantidad", "precio_unitario", "stock_minimo", "dias_mes", "ventas_mes", "unidad"]);
             $resultado = $inventario->crearItem(
                 $data["categoria"],
                 $data["nombre"],
@@ -22,18 +38,13 @@ switch ($op) {
                 $data["stock_minimo"],
                 $data["dias_mes"],
                 $data["ventas_mes"],
-                $data["total_existencia"],
                 $data["unidad"]
             );
-            echo json_encode(["success" => $resultado]);
-        } else {
-            echo json_encode(["error" => "Datos incompletos"]);
-        }
-        break;
+            api_success("Item creado correctamente", ["success" => (bool)$resultado], 201);
 
-    case 'actualizar':
-        $data = json_decode(file_get_contents("php://input"), true);
-        if(isset($data["id"], $data["categoria"], $data["nombre"], $data["cantidad"], $data["precio_unitario"], $data["stock_minimo"], $data["dias_mes"], $data["ventas_mes"], $data["total_existencia"], $data["unidad"])) {
+        case 'actualizar':
+            $data = api_input_json();
+            api_require_fields($data, ["id", "categoria", "nombre", "cantidad", "precio_unitario", "stock_minimo", "dias_mes", "ventas_mes", "unidad"]);
             $resultado = $inventario->actualizarItem(
                 $data["id"],
                 $data["categoria"],
@@ -43,23 +54,17 @@ switch ($op) {
                 $data["stock_minimo"],
                 $data["dias_mes"],
                 $data["ventas_mes"],
-                $data["total_existencia"],
                 $data["unidad"]
             );
-            echo json_encode(["success" => $resultado]);
-        } else {
-            echo json_encode(["error" => "Datos incompletos"]);
-        }
-        break;
+            api_success("Item actualizado correctamente", ["success" => (bool)$resultado]);
 
-    case 'eliminar':
-        $id = $_GET["id"];
-        $resultado = $inventario->eliminarItem($id);
-        echo json_encode(["success" => $resultado]);
-        break;
+        case 'eliminar':
+            $id = $_GET["id"] ?? null;
+            if (!$id) {
+                api_error("Falta el parámetro id", 400);
+            }
+            $resultado = $inventario->eliminarItem($id);
+            api_success("Item eliminado correctamente", ["success" => (bool)$resultado]);
+    }
+});
 
-    default:
-        echo json_encode(["error" => "Operación no válida"]);
-        break;
-}
-?>

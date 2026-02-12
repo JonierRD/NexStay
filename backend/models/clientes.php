@@ -16,8 +16,7 @@ class Clientes {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
-    // Crear un nuevo cliente
+// Crear un nuevo cliente (modificado para devolver el ID insertado)
 public function crearCliente($nombre, $cedula, $ciudad_origen, $ciudad_destino, $profesion, $documento, $correo, $telefono, $habitacion_id, $direccion) {
     $query = "INSERT INTO clientes 
         (nombre, cedula, ciudad_origen, ciudad_destino, profesion, documento, correo, telefono, habitacion_id, direccion, creado_at) 
@@ -37,13 +36,15 @@ public function crearCliente($nombre, $cedula, $ciudad_origen, $ciudad_destino, 
     $stmt->bindParam(':direccion', $direccion);
 
     if($stmt->execute()){
-        return true;
+        // devolver el id insertado (string o int)
+        return $this->conn->lastInsertId();
     } else {
-        // Muestra error real de MySQL para depuración
-        print_r($stmt->errorInfo());
+        // Muestra error real de MySQL para depuración (puedes quitar en producción)
+        // error_log(print_r($stmt->errorInfo(), true));
         return false;
     }
 }
+
 
 // Obtener un cliente por ID
 public function obtenerCliente($id) {

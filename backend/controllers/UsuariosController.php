@@ -1,59 +1,74 @@
 <?php
-require_once "../models/Usuarios.php";
+require_once "../models/usuarios.php";
+require_once "../auth/require_auth.php";
+require_once __DIR__ . "/../api/response.php";
 
-header("Content-Type: application/json");
+api_guard(function () {
+    $usuarios = new Usuarios();
+    $op = $_GET["op"] ?? "";
 
-$usuarios = new Usuarios();
-$op = isset($_GET["op"]) ? $_GET["op"] : "";
+    require_auth(['admin']);
+    $CURRENT_USER = getAuthUser();
 
-switch($op) {
+    switch($op) {
+        case "obtener":
+            api_success("Usuarios obtenidos", $usuarios->obtenerUsuarios());
 
-    case "obtener":
-        $datos = $usuarios->obtenerUsuarios();
-        echo json_encode($datos);
-        break;
+        case "obtenerId":
+            $id = $_GET["id"] ?? null;
+            if (!$id) {
+                api_error("Falta el parámetro id", 400);
+            }
+            $item = $usuarios->obtenerUsuarioId($id);
+            if (!$item) {
+                api_error("Usuario no encontrado", 404);
+            }
+            api_success("Usuario obtenido", $item);
 
-    case "obtenerId":
-        $id = $_GET["id"];
-        $dato = $usuarios->obtenerUsuarioId($id);
-        echo json_encode($dato);
-        break;
+        case "insertar":
+            $data = api_input_json();
+            api_require_fields($data, ["usuario", "password", "rol"]);
+            $resultado = $usuarios->insertarUsuario(
+                $data["usuario"],
+                $data["password"],
+                $data["nombre"] ?? null,
+                $data["correo"] ?? null,
+                $data["rol"]
+            );
+            if (isset($resultado["error"])) {
+                api_error($resultado["error"], 400);
+            }
+            api_success("Usuario creado correctamente", $resultado, 201);
 
-    case "insertar":
-        $data = json_decode(file_get_contents("php://input"), true);
+        case "actualizar":
+            $data = api_input_json();
+            api_require_fields($data, ["id"]);
+            $resultado = $usuarios->actualizarUsuario(
+                $data["id"],
+                $data["usuario"] ?? null,
+                $data["password"] ?? null,
+                $data["nombre"] ?? null,
+                $data["correo"] ?? null,
+                $data["rol"] ?? null
+            );
+            if (isset($resultado["error"])) {
+                api_error($resultado["error"], 400);
+            }
+            api_success("Usuario actualizado correctamente", $resultado);
 
-        $usuario = $data['usuario'] ?? null;
-        $password = $data['password'] ?? null;
-        $nombre = $data['nombre'] ?? null;
-        $correo = $data['correo'] ?? null;
-        $rol = $data['rol'] ?? null;
+        case "eliminar":
+            $id = $_GET["id"] ?? null;
+            if (!$id) {
+                api_error("Falta el parámetro id", 400);
+            }
+            $resultado = $usuarios->eliminarUsuario($id);
+            if (isset($resultado["error"])) {
+                api_error($resultado["error"], 400);
+            }
+            api_success("Usuario eliminado correctamente", $resultado);
 
-        $resultado = $usuarios->insertarUsuario($usuario, $password, $nombre, $correo, $rol);
-        echo json_encode(["success" => $resultado]);
-        break;
+        default:
+            api_error("Operación no válida", 400);
+    }
+});
 
-    case "actualizar":
-        $data = json_decode(file_get_contents("php://input"), true);
-
-        $id = $data['id'] ?? null;
-        $usuario = $data['usuario'] ?? null;
-        $password = $data['password'] ?? null;
-        $nombre = $data['nombre'] ?? null;
-        $correo = $data['correo'] ?? null;
-        $rol = $data['rol'] ?? null;
-
-        $resultado = $usuarios->actualizarUsuario($id, $usuario, $password, $nombre, $correo, $rol);
-        echo json_encode(["success" => $resultado]);
-        break;
-
-    case "eliminar":
-        $data = json_decode(file_get_contents("php://input"), true);
-        $id = $data['id'] ?? null;
-        $resultado = $usuarios->eliminarUsuario($id);
-        echo json_encode(["success" => $resultado]);
-        break;
-
-    default:
-        echo json_encode(["error" => "Operación no válida"]);
-}
-?>

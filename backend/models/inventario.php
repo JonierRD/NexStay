@@ -9,7 +9,7 @@ class Inventario {
         $this->conn = $database->getConnection();
     }
 
-    // Obtener todos los items de inventario
+    // Obtener todos los items
     public function obtenerInventario() {
         $query = "SELECT * FROM inventario";
         $stmt = $this->conn->prepare($query);
@@ -17,12 +17,12 @@ class Inventario {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Crear un item nuevo
-    public function crearItem($categoria, $nombre, $cantidad, $precio_unitario, $stock_minimo, $dias_mes, $ventas_mes, $total_existencia, $unidad) {
+    // Crear item
+    public function crearItem($categoria, $nombre, $cantidad, $precio_unitario, $stock_minimo, $dias_mes, $ventas_mes, $unidad) {
         $query = "INSERT INTO inventario 
-        (categoria, nombre, cantidad, precio_unitario, stock_minimo, dias_mes, ventas_mes, total_existencia, unidad, actualizado_at)
+        (categoria, nombre, cantidad, precio_unitario, stock_minimo, dias_mes, ventas_mes, unidad, actualizado_at)
         VALUES 
-        (:categoria, :nombre, :cantidad, :precio_unitario, :stock_minimo, :dias_mes, :ventas_mes, :total_existencia, :unidad, NOW())";
+        (:categoria, :nombre, :cantidad, :precio_unitario, :stock_minimo, :dias_mes, :ventas_mes, :unidad, NOW())";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':categoria', $categoria);
@@ -32,14 +32,13 @@ class Inventario {
         $stmt->bindParam(':stock_minimo', $stock_minimo);
         $stmt->bindParam(':dias_mes', $dias_mes);
         $stmt->bindParam(':ventas_mes', $ventas_mes);
-        $stmt->bindParam(':total_existencia', $total_existencia);
         $stmt->bindParam(':unidad', $unidad);
 
         return $stmt->execute();
     }
 
     // Actualizar item
-    public function actualizarItem($id, $categoria, $nombre, $cantidad, $precio_unitario, $stock_minimo, $dias_mes, $ventas_mes, $total_existencia, $unidad) {
+    public function actualizarItem($id, $categoria, $nombre, $cantidad, $precio_unitario, $stock_minimo, $dias_mes, $ventas_mes, $unidad) {
         $query = "UPDATE inventario SET 
                     categoria = :categoria,
                     nombre = :nombre,
@@ -48,7 +47,6 @@ class Inventario {
                     stock_minimo = :stock_minimo,
                     dias_mes = :dias_mes,
                     ventas_mes = :ventas_mes,
-                    total_existencia = :total_existencia,
                     unidad = :unidad,
                     actualizado_at = NOW()
                   WHERE id = :id";
@@ -62,7 +60,6 @@ class Inventario {
         $stmt->bindParam(':stock_minimo', $stock_minimo);
         $stmt->bindParam(':dias_mes', $dias_mes);
         $stmt->bindParam(':ventas_mes', $ventas_mes);
-        $stmt->bindParam(':total_existencia', $total_existencia);
         $stmt->bindParam(':unidad', $unidad);
 
         return $stmt->execute();

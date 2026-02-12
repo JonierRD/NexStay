@@ -1,7 +1,7 @@
 <?php
 class Conexion {
     private $host = "127.0.0.1";
-    private $port = "3307"; // usa el puerto correcto
+    private $port = "3307"; 
     private $dbname = "nexstay_db";
     private $user = "root";
     private $password = "12345";
