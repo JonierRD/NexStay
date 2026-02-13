@@ -48,6 +48,7 @@ http://localhost/NexStay/
 
 Desarrollado por [   Jonier Esneider Rendon Chamorro
                      Sidney Kent Villada Papamija
+                     Belladira Oliveira
                      Jamilton Jhony Rueda Legarda      ]
                      
 Proyecto académico - Universidad Tecnológica del Putumayo
