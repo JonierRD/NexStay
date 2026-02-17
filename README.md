@@ -48,9 +48,8 @@ http://localhost/NexStay/
 
 Desarrollado por [   Jonier Esneider Rendon Chamorro
                      Sidney Kent Villada Papamija
-                     Bellladira Oliveira
-                     Jamilton Jhony Rueda Legarda      ]
+                     Jamilton Jhony Rueda Legarda  
+                     belladira oliveira    ]
                      
 Proyecto académico - Universidad Tecnológica del Putumayo
 2025
-Aporte de Legarda para la práctica de Git Forks y PR.
