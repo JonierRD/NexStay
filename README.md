@@ -16,7 +16,7 @@ Sistema web para la gestión hotelera que permite controlar reservas, clientes, 
 ---
 
 ## 🧱 Estructura del proyecto
-
+MVC ( modelo vista controlador)
 NEXSTAY/
 ├── frontend/ # Interfaz de usuario (HTML, CSS, JS)
 ├── backend/ # Lógica del servidor y base de datos
@@ -29,7 +29,7 @@ NEXSTAY/
 - **Backend:** PHP, MySQL  
 - **Control de versiones:** Git & GitHub  
 - **Entorno de desarrollo:** Visual Studio Code  
-
+XAMMP
 ---
 
 ## ⚙️ Instalación y uso
@@ -48,9 +48,9 @@ http://localhost/NexStay/
 
 Desarrollado por [   Jonier Esneider Rendon Chamorro
                      Sidney Kent Villada Papamija
+                     Bellladira Oliveira
                      Jamilton Jhony Rueda Legarda      ]
                      
 Proyecto académico - Universidad Tecnológica del Putumayo
 2025
 Aporte de Legarda para la práctica de Git Forks y PR.
-Contribución de legarda como práctica del fork.
